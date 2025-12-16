@@ -97,24 +97,34 @@ chmod +x llama-installer.sh
 ./llama-installer.sh
 ```
 
-### Method 3: Bash function (for frequent users)
+### Method 4: Install the installer globally (Recommended for frequent use)
 
-**Add function to ~/.bashrc:**
+**Install the installer script itself:**
 
 ```bash
-# Add to ~/.bashrc
-llama-installer() { 
-    curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- "$@"
-}
+# One-line installation of the installer
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -- --install
 
-# Restart terminal or run:
-source ~/.bashrc
-
-# Use like normal command
-llama-installer --help
-llama-installer -n
-llama-installer -d /custom/path
+# Or pin to specific commit for stability
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/ebe0029/llama-installer.sh | bash -- --install
 ```
+
+**Then use from anywhere:**
+
+```bash
+llama-installer --help      # Show help
+llama-installer -n          # Dry run
+llama-installer             # Install latest llama.cpp
+llama-installer -v b7411    # Install specific version
+```
+
+**Features:**
+- ✅ Installs to `~/.local/bin/llama-installer`
+- ✅ Automatically sets executable permissions
+- ✅ Configures PATH for future sessions
+- ✅ Verifies installation after setup
+- ✅ Supports overwriting existing installations
+- ✅ Works with both `master` branch and specific commits
 
 ### Basic usage (local file)
 
@@ -137,6 +147,7 @@ llama-installer -d /custom/path
 - `-n, --dry-run` - Show what will be installed without installing
 - `-u, --update` - Update existing binaries (alias: `--force`, `--upgrade`)
 - `--check-only` - Only check available versions and exit
+- `--install` - Install this script to `~/.local/bin/llama-installer` for global use
 
 ## Supported Platforms
 
@@ -180,6 +191,14 @@ curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads
 
 # Update existing installation
 curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -u
+
+# NEW: Install the installer globally (recommended for frequent use)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -- --install
+
+# Then use from anywhere:
+# llama-installer --help
+# llama-installer -n
+# llama-installer
 ```
 
 ### Advanced Examples
@@ -343,6 +362,16 @@ curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads
 ```
 
 ## Changelog
+
+### v1.1.0
+- **NEW:** Added `--install` option for self-installation
+- **NEW:** Install script globally to `~/.local/bin/llama-installer`
+- **NEW:** Automatic PATH configuration for installed script
+- **NEW:** Interactive confirmation for overwriting existing installations
+- **NEW:** Installation verification after setup
+- **NEW:** Support for both master branch and specific commits
+- **IMPROVED:** Updated documentation with global installation examples
+- **IMPROVED:** Enhanced help text with new options
 
 ### v1.0.0
 - First version
