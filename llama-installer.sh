@@ -197,16 +197,17 @@ fetch_releases() {
     
     if [ "$VERSION" = "latest" ]; then
         url="${url}/latest"
+    else
+        # Get specific version tag
+        url="${GITHUB_API_URL}/repos/${REPO_OWNER}/${REPO_NAME}/releases/tags/${VERSION}"
     fi
-    
-    log_info "Downloading release information from GitHub..."
     
     # Use printf to avoid adding newlines that break JSON parsing
     local response
     response=$(curl -s -H "Accept: application/vnd.github.v3+json" "$url")
     
     if [ $? -ne 0 ]; then
-        log_error "Failed to download information from GitHub"
+        echo "Failed to download information from GitHub" >&2
         exit 1
     fi
     
@@ -566,7 +567,8 @@ main() {
         log_info "DRY RUN MODE - no installation will be performed"
         
         # Test GitHub API connection first
-        local test_response=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest")
+        log_info "Downloading release information from GitHub..."
+        local test_response=$(fetch_releases)
         if echo "$test_response" | jq -e . >/dev/null 2>&1; then
             log_success "GitHub API connection works"
             local tag_name=$(echo "$test_response" | jq -r '.tag_name')
@@ -597,24 +599,25 @@ main() {
         exit 0
     fi
     
-    # Fetch releases
-    log_info "Downloading release information..."
-    local releases_json=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest")
+    # Fetch releases using the fetch_releases function
+    log_info "Downloading release information from GitHub..."
+    local releases_json=$(fetch_releases)
     local tag_name=$(echo "$releases_json" | jq -r '.tag_name')
     
-    log_info "Latest version: $tag_name"
+    log_info "Version: $tag_name"
     
-    # Check if already installed
-    if [ "$UPDATE" = false ] && [ -d "$INSTALL_DIR" ]; then
+    # Check if already installed (only skip if using latest version and no specific version requested)
+    if [ "$UPDATE" = false ] && [ "$VERSION" = "latest" ] && [ -d "$INSTALL_DIR" ]; then
         if [ -f "$INSTALL_DIR/llama-cli" ] || [ -f "$INSTALL_DIR/llama-server" ]; then
             log_info "llama.cpp binaries already exist in $INSTALL_DIR"
-            log_info "Use --update to update binaries"
+            log_info "Use --update to update binaries or specify a version with -v"
             
             # Test if binaries work
             if [ -x "$INSTALL_DIR/llama-cli" ]; then
                 log_info "Testing existing binaries..."
                 if "$INSTALL_DIR/llama-cli" --help >/dev/null 2>&1; then
                     log_success "Existing binaries work correctly"
+                    log_info "To install a specific version, use: $SCRIPT_NAME -v <version>"
                     exit 0
                 else
                     log_warning "Existing binaries don't work - performing reinstallation"
