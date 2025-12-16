@@ -59,12 +59,14 @@ OPTIONS:
     -n, --dry-run           Show what will be installed without installing
     -u, --update            Update existing binaries (alias: --force, --upgrade)
     --check-only            Check available versions and exit
+    --install               Install this script to ~/.local/bin/llama-installer
 
 EXAMPLES:
     $SCRIPT_NAME                    # Install latest version
     $SCRIPT_NAME -v b7411           # Install specific version
     $SCRIPT_NAME -n                 # Check what will be installed
     $SCRIPT_NAME -d /opt/bin        # Install in different directory
+    $SCRIPT_NAME --install          # Install this script globally
 
 EOF
 }
@@ -435,6 +437,84 @@ setup_path() {
     log_warning "Run 'source ~/.bashrc' or 'source ~/.zshrc' to update PATH in current session"
 }
 
+# Function to install the script itself
+self_install() {
+    local install_target="$HOME/.local/bin/llama-installer"
+    local install_dir="$(dirname "$install_target")"
+    
+    # Determine the source URL based on current execution context
+    local script_url
+    if [[ "${BASH_SOURCE[0]:-${0}}" == *"raw.githubusercontent.com"* ]]; then
+        # Running from GitHub, use the same URL but with master branch
+        script_url="https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh"
+    else
+        # Running locally, provide instructions
+        script_url="https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh"
+    fi
+    
+    log_info "Installing $SCRIPT_NAME to $install_target..."
+    
+    # Create installation directory if it doesn't exist
+    if [ ! -d "$install_dir" ]; then
+        log_info "Creating directory: $install_dir"
+        mkdir -p "$install_dir"
+    fi
+    
+    # Check if file already exists
+    if [ -f "$install_target" ]; then
+        log_warning "File already exists: $install_target"
+        read -p "Do you want to overwrite it? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Installation cancelled."
+            exit 0
+        fi
+    fi
+    
+    # Download the script
+    log_info "Downloading from: $script_url"
+    if ! curl -fsSL "$script_url" -o "$install_target"; then
+        log_error "Failed to download script from $script_url"
+        exit 1
+    fi
+    
+    # Make the script executable
+    log_info "Setting executable permissions..."
+    chmod +x "$install_target"
+    
+    # Setup PATH for future sessions
+    log_info "Setting up PATH..."
+    setup_path "$install_dir"
+    
+    # Verify installation
+    if [ -x "$install_target" ]; then
+        log_success "Installation completed successfully!"
+        log_info "Script installed at: $install_target"
+        
+        # Test if it works
+        log_info "Testing installation..."
+        if "$install_target" --help >/dev/null 2>&1; then
+            log_success "Installation verified!"
+        else
+            log_warning "Installation completed but verification failed"
+        fi
+        
+        log_info ""
+        log_info "Usage:"
+        log_info "  $install_target --help      # Show help"
+        log_info "  $install_target -n          # Dry run"
+        log_info "  $install_target             # Install latest llama.cpp"
+        log_info ""
+        log_info "For immediate use in current session, run:"
+        log_info "  source ~/.bashrc  # or source ~/.zshrc"
+        log_info "Or add to PATH manually:"
+        log_info "  export PATH=\"$install_dir:\$PATH\""
+    else
+        log_error "Installation failed - script is not executable"
+        exit 1
+    fi
+}
+
 # Main function
 main() {
     local args=()
@@ -464,6 +544,10 @@ main() {
                 ;;
             --check-only)
                 # TODO: Implement checking available versions
+                exit 0
+                ;;
+            --install|--self-install)
+                self_install
                 exit 0
                 ;;
             *)
