@@ -105,8 +105,8 @@ chmod +x llama-installer.sh
 # One-line installation of the installer (CORRECT METHOD)
 curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- --install
 
-# Or pin to specific commit for stability
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/ebe0029/llama-installer.sh | bash -s -- --install
+# Or pin to specific commit for stability (recommended during GitHub cache updates)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/adbaaf6/llama-installer.sh | bash -s -- --install
 
 # Alternative: Download and run locally
 curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh -o llama-installer.sh
@@ -198,7 +198,7 @@ curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads
 curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -u
 
 # NEW: Install the installer globally (recommended for frequent use)
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- --install
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/adbaaf6/llama-installer.sh | bash -s -- --install
 
 # Then use from anywhere:
 # llama-installer --help
@@ -383,6 +383,19 @@ curl -fsSL URL | bash -s -- --install
 
 **Why:** When using pipes, arguments after `--` go to the original shell, not the bash process processing the script via stdin.
 
+#### Issue: File already exists warning
+**Problem:** You see this message during installation:
+```
+[WARNING] File already exists: /home/user/.local/bin/llama-installer
+```
+
+**Solution:** This is normal behavior. The installer **automatically overwrites** the existing file to ensure you always have the latest version. No action needed - just wait for the installation to complete.
+
+**Note:** If GitHub's CDN hasn't updated yet, use a specific commit:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/adbaaf6/llama-installer.sh | bash -s -- --install
+```
+
 #### Issue: "Permission denied" 
 **Solution:** Make sure you have write permissions to `~/.local/bin`:
 ```bash
@@ -422,13 +435,14 @@ wget -qO- URL | bash -s -- --install
 - **NEW:** Added `--install` option for self-installation
 - **NEW:** Install script globally to `~/.local/bin/llama-installer`
 - **NEW:** Automatic PATH configuration for installed script
-- **NEW:** Interactive confirmation for overwriting existing installations
+- **NEW:** **Automatic overwriting** of existing installations (no user confirmation required)
 - **NEW:** Installation verification after setup
 - **NEW:** Support for both master branch and specific commits
 - **IMPROVED:** Updated documentation with global installation examples
 - **IMPROVED:** Enhanced help text with new options
 - **FIXED:** Documentation for correct pipe usage (`bash -s --` instead of `bash --`)
 - **ADDED:** Troubleshooting section with common issues and solutions
+- **IMPROVED:** Clear messaging about overwriting existing files
 
 ### v1.0.0
 - First version
