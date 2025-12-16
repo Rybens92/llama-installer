@@ -1,10 +1,51 @@
 # Llama Installer
 
+[![GitHub](https://img.shields.io/badge/GitHub-Rybens92%2Fllama-installer-blue?style=flat-square&logo=github)](https://github.com/Rybens92/llama-installer)
+
 Automatic installer for llama.cpp binaries for different platforms and GPU configurations.
 
 ## Description
 
 `llama-installer.sh` is a bash script that automatically downloads and installs the latest llama.cpp binaries from GitHub releases. The script detects the operating system, architecture, and GPU capabilities, then downloads the appropriate version of the binaries.
+
+## Quick Start
+
+**One-line installation:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash
+```
+
+**With options:**
+```bash
+# Test before installation (safe)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -n
+
+# Install in custom directory
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -d /opt/bin
+
+# Install specific version
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -v b7411
+```
+
+## ⚠️ Security Notice
+
+**Running scripts from the internet can be dangerous.**
+
+- Script is downloaded and executed directly from GitHub
+- Ensure the source is trusted (owner's repository)
+- For safety, test with `--dry-run` first:
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -n
+  ```
+- You can also download and inspect the script before running:
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh -o llama-installer.sh
+  # Check file contents
+  cat llama-installer.sh
+  # If everything looks good, run:
+  bash llama-installer.sh
+  ```
 
 ## Features
 
@@ -17,7 +58,65 @@ Automatic installer for llama.cpp binaries for different platforms and GPU confi
 
 ## Usage
 
-### Basic usage
+### Method 1: Direct from GitHub (Recommended)
+
+**Simplest way - one line:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash
+```
+
+**With arguments:**
+
+```bash
+# Dry-run (test what will be installed)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -n
+
+# Specific version
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -v b7411
+
+# Custom directory
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -d /opt/bin
+
+# Update existing binaries
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -u
+```
+
+### Method 2: Download and run locally
+
+**Download and run locally:**
+
+```bash
+# Download script
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh -o llama-installer.sh
+
+# Make executable
+chmod +x llama-installer.sh
+
+# Run
+./llama-installer.sh
+```
+
+### Method 3: Bash function (for frequent users)
+
+**Add function to ~/.bashrc:**
+
+```bash
+# Add to ~/.bashrc
+llama-installer() { 
+    curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- "$@"
+}
+
+# Restart terminal or run:
+source ~/.bashrc
+
+# Use like normal command
+llama-installer --help
+llama-installer -n
+llama-installer -d /custom/path
+```
+
+### Basic usage (local file)
 
 ```bash
 # Install the latest version
@@ -67,21 +166,43 @@ Automatic installer for llama.cpp binaries for different platforms and GPU confi
 
 ## Examples
 
+### Quick Install Examples
+
 ```bash
-# Basic installation
-./llama-installer.sh
+# Simplest installation
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash
 
+# Check what will be installed
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -n
+
+# Install with GPU support (CUDA/Vulkan)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -d ~/.local/bin
+
+# Update existing installation
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -u
+```
+
+### Advanced Examples
+
+```bash
 # Install specific version
-./llama-installer.sh -v b7410
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -v b7411
 
-# Dry-run to see what will be downloaded
-./llama-installer.sh -n
+# Install to /opt/bin (requires sudo)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -d /opt/bin
 
-# Update binaries
-./llama-installer.sh --update
+# Combination of options
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -d /opt/bin -v b7411 -n
+```
 
-# Check available versions
-./llama-installer.sh --check-only
+### Using as function
+
+```bash
+# After adding function to ~/.bashrc
+llama-installer              # Install latest
+llama-installer -n           # Dry run
+llama-installer -v b7411     # Specific version
+llama-installer -u           # Update
 ```
 
 ## Requirements
@@ -173,6 +294,15 @@ mkdir -p ~/.local/bin
 chmod 755 ~/.local/bin
 ```
 
+### Dry-run verification
+```bash
+# Check if remote execution works
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -n
+
+# Check available versions
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- --check-only
+```
+
 ## File structure
 
 After installation in `~/.local/bin/` you will find:
@@ -198,6 +328,20 @@ For issues:
 2. Check [issues](https://github.com/ggml-org/llama.cpp/issues)
 3. Run script with `--dry-run` to check what will be downloaded
 
+## Version Reference
+
+**Current version:** v1.0.0  
+**Latest commit:** [7ea47b3](https://github.com/Rybens92/llama-installer/commit/7ea47b3)
+
+### Pin to specific version
+```bash
+# Use specific commit (more stable)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/7ea47b3/llama-installer.sh | bash
+
+# Or master branch (latest changes)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash
+```
+
 ## Changelog
 
 ### v1.0.0
@@ -206,3 +350,5 @@ For issues:
 - Automatic GPU detection
 - SHA256 verification
 - PATH configuration
+- **Fixed:** Script execution through pipe (BASH_SOURCE fallback)
+- **Added:** Direct GitHub execution support
