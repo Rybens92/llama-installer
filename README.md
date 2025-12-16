@@ -102,11 +102,16 @@ chmod +x llama-installer.sh
 **Install the installer script itself:**
 
 ```bash
-# One-line installation of the installer
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -- --install
+# One-line installation of the installer (CORRECT METHOD)
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- --install
 
 # Or pin to specific commit for stability
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/ebe0029/llama-installer.sh | bash -- --install
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/ebe0029/llama-installer.sh | bash -s -- --install
+
+# Alternative: Download and run locally
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh -o llama-installer.sh
+chmod +x llama-installer.sh
+./llama-installer.sh --install
 ```
 
 **Then use from anywhere:**
@@ -193,7 +198,7 @@ curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads
 curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- -u
 
 # NEW: Install the installer globally (recommended for frequent use)
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -- --install
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash -s -- --install
 
 # Then use from anywhere:
 # llama-installer --help
@@ -361,6 +366,56 @@ curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/7ea47b3/ll
 curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads/master/llama-installer.sh | bash
 ```
 
+## Troubleshooting
+
+### Common Issues
+
+#### Issue: "bash: --install: Nie ma takiego pliku ani katalogu"
+**Problem:** This error occurs when using:
+```bash
+curl -fsSL URL | bash -- --install
+```
+
+**Solution:** Use `bash -s` instead:
+```bash
+curl -fsSL URL | bash -s -- --install
+```
+
+**Why:** When using pipes, arguments after `--` go to the original shell, not the bash process processing the script via stdin.
+
+#### Issue: "Permission denied" 
+**Solution:** Make sure you have write permissions to `~/.local/bin`:
+```bash
+# Check if directory exists and is writable
+ls -la ~/.local/bin
+
+# If needed, create directory
+mkdir -p ~/.local/bin
+```
+
+#### Issue: Command not found after installation
+**Solution:** Update your PATH or restart terminal:
+```bash
+# Add to current session
+export PATH="$HOME/.local/bin:$PATH"
+
+# Or add permanently to ~/.bashrc
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### Issue: Installation fails
+**Solution:** Try alternative installation methods:
+```bash
+# Method 1: Download and run locally
+curl -fsSL URL -o llama-installer.sh
+chmod +x llama-installer.sh
+./llama-installer.sh --install
+
+# Method 2: Use wget
+wget -qO- URL | bash -s -- --install
+```
+
 ## Changelog
 
 ### v1.1.0
@@ -372,6 +427,8 @@ curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/refs/heads
 - **NEW:** Support for both master branch and specific commits
 - **IMPROVED:** Updated documentation with global installation examples
 - **IMPROVED:** Enhanced help text with new options
+- **FIXED:** Documentation for correct pipe usage (`bash -s --` instead of `bash --`)
+- **ADDED:** Troubleshooting section with common issues and solutions
 
 ### v1.0.0
 - First version
