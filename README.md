@@ -9,7 +9,7 @@ Automatic installer for llama.cpp binaries across different platforms and GPU co
 **Install the installer script for easy future use:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/93de388/llama-installer.sh | bash -s -- --install
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/9181758/llama-installer.sh | bash -s -- --install
 ```
 
 **Then use from anywhere:**
@@ -24,19 +24,19 @@ llama-installer -n          # Preview installation
 **Install llama.cpp directly without global installer:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/93de388/llama-installer.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/9181758/llama-installer.sh | bash
 ```
 
 **With options:**
 ```bash
 # Preview what will be installed
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/93de388/llama-installer.sh | bash -s -- -n
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/9181758/llama-installer.sh | bash -s -- -n
 
 # Install in custom directory
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/93de388/llama-installer.sh | bash -s -- -d /opt/bin
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/9181758/llama-installer.sh | bash -s -- -d /opt/bin
 
 # Install specific version
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/93de388/llama-installer.sh | bash -s -- -v b7411
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/9181758/llama-installer.sh | bash -s -- -v b7411
 ```
 
 ## Usage
@@ -62,7 +62,7 @@ llama-installer -u
 ### Direct usage (without global install):
 ```bash
 # Download and run locally
-curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/93de388/llama-installer.sh -o llama.sh
+curl -fsSL https://raw.githubusercontent.com/Rybens92/llama-installer/9181758/llama-installer.sh -o llama.sh
 chmod +x llama.sh
 ./llama.sh --help
 ```
