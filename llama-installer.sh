@@ -460,15 +460,9 @@ self_install() {
         mkdir -p "$install_dir"
     fi
     
-    # Check if file already exists
+    # Check if file already exists and inform user
     if [ -f "$install_target" ]; then
-        log_warning "File already exists: $install_target"
-        read -p "Do you want to overwrite it? (y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            log_info "Installation cancelled."
-            exit 0
-        fi
+        log_info "Overwriting existing installation: $install_target"
     fi
     
     # Download the script
