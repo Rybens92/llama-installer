@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # llama-installer.sh - Automatic installer for llama.cpp binaries
-# Version: 1.0.0
+# Version: 1.2.0
 # Author: OpenHands
 # Description: Downloads and installs the latest llama.cpp binaries from GitHub releases
 
@@ -510,6 +510,54 @@ self_install() {
     fi
 }
 
+# Function to check installed llama.cpp version
+check_llama_version() {
+    local llama_server_path="$1"
+    
+    # Check if file exists and is executable
+    if [ ! -x "$llama_server_path" ]; then
+        return 1  # Not installed or not executable
+    fi
+    
+    # Try to get version from --version flag (output goes to stderr)
+    local version_output
+    if version_output=$("$llama_server_path" --version 2>&1); then
+        # Extract version number (7411 from "version: 7411 (165caaf5f)")
+        local installed_version=$(echo "$version_output" | grep "version:" | awk '{print $2}' | cut -d'(' -f1)
+        if [ -n "$installed_version" ]; then
+            echo "$installed_version"
+            return 0
+        fi
+    fi
+    
+    # Fallback: if --version doesn't work, try --help to check if binary is functional
+    if "$llama_server_path" --help >/dev/null 2>&1; then
+        # Binary works but --version failed - this might be an older version or different output format
+        log_warning "llama-server works but version format could not be parsed"
+        # Return a special value to indicate binary exists but version unknown
+        echo "unknown"
+        return 0
+    fi
+    
+    # If neither --version nor --help works, assume binary is broken or incomplete
+    log_warning "llama-server binary exists but doesn't work properly"
+    return 1
+}
+
+# Function to get latest available version from GitHub
+get_latest_version() {
+    local latest_tag
+    latest_tag=$(curl -s "${GITHUB_API_URL}/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest" | jq -r '.tag_name')
+    
+    if [ -n "$latest_tag" ] && [ "$latest_tag" != "null" ]; then
+        # Extract number from tag (b7426 -> 7426)
+        echo "$latest_tag" | sed 's/^b//'
+        return 0
+    fi
+    
+    return 1
+}
+
 # Main function
 main() {
     local args=()
@@ -623,6 +671,42 @@ main() {
                     log_warning "Existing binaries don't work - performing reinstallation"
                 fi
             fi
+        fi
+    fi
+    
+    # Handle --update flag with version checking
+    if [ "$UPDATE" = true ]; then
+        local llama_server="$INSTALL_DIR/llama-server"
+        local installed_version
+        local latest_version
+        
+        # Check installed version
+        if installed_version=$(check_llama_version "$llama_server"); then
+            # Handle special case where version could not be determined but binary exists
+            if [ "$installed_version" = "unknown" ]; then
+                log_warning "llama.cpp binary exists but version could not be determined"
+                log_info "Proceeding with update to ensure compatibility"
+            else
+                log_info "Current installed version: $installed_version"
+                
+                # Check latest available version
+                if latest_version=$(get_latest_version); then
+                    log_info "Latest available version: $latest_version"
+                    
+                    # Compare versions
+                    if [ "$installed_version" -ge "$latest_version" ] 2>/dev/null; then
+                        log_success "You already have the latest version of llama.cpp ($installed_version)"
+                        log_info "No update needed."
+                        exit 0
+                    else
+                        log_info "New version available: $latest_version (current: $installed_version)"
+                    fi
+                else
+                    log_warning "Could not check latest version - proceeding with update"
+                fi
+            fi
+        else
+            log_info "llama.cpp not found or not working properly - installing fresh"
         fi
     fi
     

@@ -88,6 +88,11 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
 ## Changelog
 
+### v1.2.0
+- **NEW:** Smart version checking for --update/-u flag
+- **IMPROVED:** No longer downloads same version when already up-to-date
+- **IMPROVED:** Better error handling for broken binaries
+
 ### v1.1.0
 - **NEW:** Global installer option (`--install`)
 - **IMPROVED:** Automatic overwriting, better documentation
